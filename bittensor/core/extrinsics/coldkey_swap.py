@@ -186,6 +186,75 @@ def dispute_coldkey_swap_extrinsic(
         return ExtrinsicResponse.from_exception(raise_error=raise_error, error=error)
 
 
+def clear_coldkey_swap_announcement_extrinsic(
+    subtensor: "Subtensor",
+    wallet: "Wallet",
+    *,
+    mev_protection: bool = DEFAULT_MEV_PROTECTION,
+    period: Optional[int] = None,
+    raise_error: bool = False,
+    wait_for_inclusion: bool = True,
+    wait_for_finalization: bool = True,
+    wait_for_revealed_execution: bool = True,
+) -> ExtrinsicResponse:
+    """
+    Clears (withdraws) a pending coldkey swap announcement.
+
+    Callable by the coldkey that has an active, undisputed swap announcement. The reannouncement delay must have
+    elapsed past the execution block before the announcement can be cleared.
+
+    Parameters:
+        subtensor: Subtensor instance with the connection to the chain.
+        wallet: Bittensor wallet object (should be the current coldkey with an active announcement).
+        mev_protection: If `True`, encrypts and submits the transaction through the MEV Shield pallet.
+        period: The number of blocks during which the transaction will remain valid.
+        raise_error: Raises a relevant exception rather than returning `False` if unsuccessful.
+        wait_for_inclusion: Whether to wait for the inclusion of the transaction.
+        wait_for_finalization: Whether to wait for the finalization of the transaction.
+        wait_for_revealed_execution: Whether to wait for the revealed execution if mev_protection used.
+
+    Returns:
+        ExtrinsicResponse: The result object of the extrinsic execution.
+
+    Notes:
+        - The coldkey must have an active, undisputed swap announcement.
+        - The reannouncement delay must have elapsed past the execution block.
+    """
+    try:
+        if not (
+            unlocked := ExtrinsicResponse.unlock_wallet(wallet, raise_error)
+        ).success:
+            return unlocked
+
+        call = SubtensorModule(subtensor).clear_coldkey_swap_announcement()
+
+        if mev_protection:
+            response = submit_encrypted_extrinsic(
+                subtensor=subtensor,
+                wallet=wallet,
+                call=call,
+                period=period,
+                raise_error=raise_error,
+                wait_for_inclusion=wait_for_inclusion,
+                wait_for_finalization=wait_for_finalization,
+                wait_for_revealed_execution=wait_for_revealed_execution,
+            )
+        else:
+            response = subtensor.sign_and_send_extrinsic(
+                call=call,
+                wallet=wallet,
+                wait_for_inclusion=wait_for_inclusion,
+                wait_for_finalization=wait_for_finalization,
+                period=period,
+                raise_error=raise_error,
+            )
+
+        return response
+
+    except Exception as error:
+        return ExtrinsicResponse.from_exception(raise_error=raise_error, error=error)
+
+
 def swap_coldkey_announced_extrinsic(
     subtensor: "Subtensor",
     wallet: "Wallet",
