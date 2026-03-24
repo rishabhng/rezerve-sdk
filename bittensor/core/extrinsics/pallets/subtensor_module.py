@@ -366,6 +366,17 @@ class SubtensorModule(_BasePallet):
         """
         return self.create_composed_call()
 
+    def clear_coldkey_swap_announcement(self) -> Call:
+        """Returns GenericCall instance for Subtensor function SubtensorModule.clear_coldkey_swap_announcement.
+
+        Callable by the coldkey that has an active swap announcement. Withdraws the announcement
+        after the reannouncement delay has elapsed past the execution block.
+
+        Returns:
+            GenericCall instance.
+        """
+        return self.create_composed_call()
+
     def reset_coldkey_swap(self, coldkey: str) -> Call:
         """Returns GenericCall instance for Subtensor function SubtensorModule.reset_coldkey_swap.
 
