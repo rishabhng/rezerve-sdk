@@ -38,15 +38,24 @@ def test_coldkey_swap(subtensor, alice_wallet, bob_wallet, charlie_wallet, dave_
        - Step 2: Attempt to execute other transaction (transfer) from announced coldkey
        - Step 3: Verify transaction is blocked (except swap_coldkey_announced)
 
-    5. Dispute and root reset:
+    5. Clear announcement:
+       - Step 1: Announce swap
+       - Step 2: Attempt to clear too early (should fail)
+       - Step 3: Wait for clear block (execution_block + reannouncement_delay)
+       - Step 4: Clear the announcement
+       - Step 5: Verify announcement is removed
+       - Step 6: Verify transfers are unblocked after clear
+
+    6. Dispute and root reset:
        - Step 1: Dave announces swap, then disputes it (dispute_coldkey_swap)
        - Step 2: Verify dispute is recorded (get_coldkey_swap_dispute)
        - Step 3: Verify account is blocked (transfer fails)
-       - Step 4: Root resets coldkey swap (reset_coldkey_swap)
-       - Step 5: Verify dispute and announcement are cleared
-       - Step 6: Verify transfers are unblocked after reset
+       - Step 4: Verify clear is blocked while disputed
+       - Step 5: Root resets coldkey swap (reset_coldkey_swap)
+       - Step 6: Verify dispute and announcement are cleared
+       - Step 7: Verify transfers are unblocked after reset
 
-    6. Root swap override:
+    7. Root swap override:
        - Step 1: Root swaps Dave to Charlie without announcement
        - Step 2: Verify announcement and dispute are cleared
        - Step 3: Verify old coldkey is reaped
@@ -434,7 +443,74 @@ def test_coldkey_swap(subtensor, alice_wallet, bob_wallet, charlie_wallet, dave_
         )
         assert response.success, f"Failed to fund Dave: {response.message}"
 
-    # === 5. Dispute and root reset ===
+    # === 5. Clear announcement ===
+    logging.console.info("Testing clear announcement")
+
+    # Step 1: Alice announces swap to Bob
+    logging.console.info("Step 1: Alice announces swap to Bob")
+    existing_announcement = subtensor.wallets.get_coldkey_swap_announcement(
+        coldkey_ss58=alice_wallet.coldkeypub.ss58_address
+    )
+    assert existing_announcement is None, (
+        "No announcement should exist before clear test"
+    )
+    response = subtensor.extrinsics.announce_coldkey_swap(
+        wallet=alice_wallet,
+        new_coldkey_ss58=bob_wallet.coldkeypub.ss58_address,
+    )
+    assert response.success, f"Failed to announce swap: {response.message}"
+    announcement = subtensor.wallets.get_coldkey_swap_announcement(
+        coldkey_ss58=alice_wallet.coldkeypub.ss58_address
+    )
+    assert announcement is not None, "Announcement should exist"
+
+    # Step 2: Attempt to clear too early (before clear_block)
+    logging.console.info("Step 2: Attempting clear too early (should fail)")
+    clear_block = announcement.execution_block + reannouncement_delay
+    current_block = subtensor.chain.get_current_block()
+    assert current_block < clear_block, "Current block should be before clear block"
+    response = subtensor.extrinsics.clear_coldkey_swap_announcement(
+        wallet=alice_wallet,
+        raise_error=False,
+    )
+    assert not response.success, "Clear should fail before clear block"
+    logging.console.info("Clear too early correctly rejected")
+
+    # Step 3: Wait for clear_block (execution_block + reannouncement_delay)
+    logging.console.info(
+        f"Step 3: Waiting for clear block {clear_block} "
+        f"(execution={announcement.execution_block} + reannounce_delay={reannouncement_delay})"
+    )
+    subtensor.wait_for_block(clear_block)
+
+    # Step 4: Clear the announcement
+    logging.console.info("Step 4: Clearing announcement")
+    response = subtensor.extrinsics.clear_coldkey_swap_announcement(
+        wallet=alice_wallet,
+    )
+    assert response.success, f"Failed to clear announcement: {response.message}"
+
+    # Step 5: Verify announcement is removed
+    logging.console.info("Step 5: Verify announcement is removed")
+    announcement_after_clear = subtensor.wallets.get_coldkey_swap_announcement(
+        coldkey_ss58=alice_wallet.coldkeypub.ss58_address
+    )
+    assert announcement_after_clear is None, (
+        "Announcement should be removed after clear"
+    )
+
+    # Step 6: Verify transfers work again
+    logging.console.info("Step 6: Verify transfers are unblocked after clear")
+    response = subtensor.extrinsics.transfer(
+        wallet=alice_wallet,
+        destination_ss58=charlie_wallet.coldkeypub.ss58_address,
+        amount=Balance.from_tao(1),
+        raise_error=False,
+    )
+    assert response.success, "Transfer should be allowed after clear"
+    logging.console.info("Clear announcement test completed successfully")
+
+    # === 6. Dispute and root reset ===
     logging.console.info("Testing dispute and root reset")
 
     # Step 1: Dave announces swap to Charlie
@@ -478,6 +554,14 @@ def test_coldkey_swap(subtensor, alice_wallet, bob_wallet, charlie_wallet, dave_
         raise_error=False,
     )
     assert not response.success, "Transfer should be blocked while disputed"
+
+    # Step 4b: Verify clear is also blocked while disputed
+    logging.console.info("Step 4b: Verify clear is blocked while disputed")
+    response = subtensor.extrinsics.clear_coldkey_swap_announcement(
+        wallet=dave_wallet,
+        raise_error=False,
+    )
+    assert not response.success, "Clear should be blocked while disputed"
     logging.console.info("Account blocking verified")
 
     # Step 5: Root resets the coldkey swap (alice_wallet is //Alice, root)
@@ -513,7 +597,7 @@ def test_coldkey_swap(subtensor, alice_wallet, bob_wallet, charlie_wallet, dave_
     assert response.success, "Transfer should be allowed after reset"
     logging.console.info("Dispute scenario completed successfully")
 
-    # === 6. Root swap override ===
+    # === 7. Root swap override ===
     logging.console.info("Testing root swap override")
 
     # Ensure Dave has enough balance for root swap cost
