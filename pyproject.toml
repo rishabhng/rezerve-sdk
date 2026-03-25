@@ -19,7 +19,6 @@ dependencies = [
     "asyncstdlib~=3.13.0",
     "colorama~=0.4.6",
     "fastapi>=0.110.1",
-    "munch>=4.0.0",
     "numpy>=2.0.1,<3.0.0",
     "msgpack-numpy-opentensor~=0.5",
     "netaddr==1.3.0",

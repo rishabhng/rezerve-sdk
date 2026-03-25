@@ -23,7 +23,51 @@ from copy import deepcopy
 from typing import Any, Optional
 from bittensor.core.settings import DEFAULTS
 import yaml
-from munch import DefaultMunch
+
+
+class DefaultMunch(dict):
+    """
+    Dict with attribute-style access and a configurable default value.
+
+    Drop-in replacement for munch.DefaultMunch using only the stdlib.
+    The default value (returned for missing keys) is stored on the instance
+    via ``object.__setattr__`` so it never collides with dict entries.
+    """
+
+    def __init__(self, default=None, *args, **kwargs):
+        object.__setattr__(self, "_munch_default", default)
+        super().__init__(*args, **kwargs)
+
+    def __getattr__(self, key):
+        try:
+            return self[key]
+        except KeyError:
+            return object.__getattribute__(self, "_munch_default")
+
+    def __setattr__(self, key, value):
+        self[key] = value
+
+    def __delattr__(self, key):
+        try:
+            del self[key]
+        except KeyError:
+            raise AttributeError(key)
+
+    def toDict(self):
+        """Recursively converts this object to a plain dict."""
+
+        def _convert(v):
+            return v.toDict() if isinstance(v, DefaultMunch) else v
+
+        return {k: _convert(v) for k, v in self.items()}
+
+    @classmethod
+    def fromDict(cls, d, _default=None):
+        """Recursively creates a DefaultMunch from a plain dict."""
+        result = cls(_default)
+        for k, v in d.items():
+            result[k] = cls.fromDict(v, _default) if isinstance(v, dict) else v
+        return result
 
 
 def _filter_keys(obj):
