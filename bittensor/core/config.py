@@ -65,6 +65,20 @@ class DefaultMunch(dict):
 
         return {k: _convert(v) for k, v in self.items()}
 
+    def __deepcopy__(self, memo):
+        """
+        Explicit deepcopy so Python 3.10 never falls through to __reduce_ex__.
+
+        Without this, ``copy.deepcopy`` on a dict subclass tries
+        ``getattr(x, "__reduce_ex__", None)``, which hits our ``__getattr__``
+        and returns ``None`` (the default value) instead of the real method.
+        """
+        new = DefaultMunch(object.__getattribute__(self, "_munch_default"))
+        memo[id(self)] = new
+        for k, v in self.items():
+            new[deepcopy(k, memo)] = deepcopy(v, memo)
+        return new
+
     @classmethod
     def fromDict(cls, d, _default=None):
         """Recursively creates a DefaultMunch from a plain dict."""
