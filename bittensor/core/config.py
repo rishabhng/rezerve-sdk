@@ -36,7 +36,11 @@ class DefaultMunch(dict):
 
     def __init__(self, default=None, *args, **kwargs):
         object.__setattr__(self, "_munch_default", default)
-        super().__init__(*args, **kwargs)
+        super().__init__()
+        if args or kwargs:
+            source = dict(*args, **kwargs)
+            for k, v in source.items():
+                self[k] = DefaultMunch.fromDict(v) if isinstance(v, dict) else v
 
     def __getattr__(self, key):
         try:
@@ -68,6 +72,21 @@ class DefaultMunch(dict):
         for k, v in d.items():
             result[k] = cls.fromDict(v, _default) if isinstance(v, dict) else v
         return result
+
+
+def _class_to_dict(cls) -> dict:
+    """
+    Recursively converts a class with class-level attributes to a plain dict.
+
+    Skips private/dunder attributes. Nested classes become nested dicts.
+    Used to convert the `DEFAULTS` class from settings into a plain dict.
+    """
+    result = {}
+    for k, v in vars(cls).items():
+        if k.startswith("_"):
+            continue
+        result[k] = _class_to_dict(v) if isinstance(v, type) else v
+    return result
 
 
 def _filter_keys(obj):
@@ -108,11 +127,14 @@ class Config(DefaultMunch):
         default = deepcopy(default or DEFAULTS)
 
         if isinstance(default, DefaultMunch):
-            # Initialize Munch with defaults (dict-safe)
             super().__init__(None, default.toDict())
-        else:
-            # if defaults passed as dict
+        elif isinstance(default, dict):
             super().__init__(None, default)
+        elif isinstance(default, type):
+            # DEFAULTS is a class with nested classes; convert to plain dict
+            super().__init__(None, _class_to_dict(default))
+        else:
+            super().__init__(None)
 
         self.__is_set = {}
 
