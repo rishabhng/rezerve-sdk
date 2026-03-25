@@ -23,7 +23,84 @@ from copy import deepcopy
 from typing import Any, Optional
 from bittensor.core.settings import DEFAULTS
 import yaml
-from munch import DefaultMunch
+
+
+class DefaultMunch(dict):
+    """
+    Dict with attribute-style access and a configurable default value.
+
+    Drop-in replacement for munch.DefaultMunch using only the stdlib.
+    The default value (returned for missing keys) is stored on the instance
+    via ``object.__setattr__`` so it never collides with dict entries.
+    """
+
+    def __init__(self, default=None, *args, **kwargs):
+        object.__setattr__(self, "_munch_default", default)
+        super().__init__()
+        if args or kwargs:
+            source = dict(*args, **kwargs)
+            for k, v in source.items():
+                self[k] = DefaultMunch.fromDict(v) if isinstance(v, dict) else v
+
+    def __getattr__(self, key):
+        try:
+            return self[key]
+        except KeyError:
+            return object.__getattribute__(self, "_munch_default")
+
+    def __setattr__(self, key, value):
+        self[key] = value
+
+    def __delattr__(self, key):
+        try:
+            del self[key]
+        except KeyError:
+            raise AttributeError(key)
+
+    def toDict(self):
+        """Recursively converts this object to a plain dict."""
+
+        def _convert(v):
+            return v.toDict() if isinstance(v, DefaultMunch) else v
+
+        return {k: _convert(v) for k, v in self.items()}
+
+    def __deepcopy__(self, memo):
+        """
+        Explicit deepcopy so Python 3.10 never falls through to __reduce_ex__.
+
+        Without this, ``copy.deepcopy`` on a dict subclass tries
+        ``getattr(x, "__reduce_ex__", None)``, which hits our ``__getattr__``
+        and returns ``None`` (the default value) instead of the real method.
+        """
+        new = DefaultMunch(object.__getattribute__(self, "_munch_default"))
+        memo[id(self)] = new
+        for k, v in self.items():
+            new[deepcopy(k, memo)] = deepcopy(v, memo)
+        return new
+
+    @classmethod
+    def fromDict(cls, d, _default=None):
+        """Recursively creates a DefaultMunch from a plain dict."""
+        result = cls(_default)
+        for k, v in d.items():
+            result[k] = cls.fromDict(v, _default) if isinstance(v, dict) else v
+        return result
+
+
+def _class_to_dict(cls) -> dict:
+    """
+    Recursively converts a class with class-level attributes to a plain dict.
+
+    Skips private/dunder attributes. Nested classes become nested dicts.
+    Used to convert the `DEFAULTS` class from settings into a plain dict.
+    """
+    result = {}
+    for k, v in vars(cls).items():
+        if k.startswith("_"):
+            continue
+        result[k] = _class_to_dict(v) if isinstance(v, type) else v
+    return result
 
 
 def _filter_keys(obj):
@@ -64,11 +141,14 @@ class Config(DefaultMunch):
         default = deepcopy(default or DEFAULTS)
 
         if isinstance(default, DefaultMunch):
-            # Initialize Munch with defaults (dict-safe)
             super().__init__(None, default.toDict())
-        else:
-            # if defaults passed as dict
+        elif isinstance(default, dict):
             super().__init__(None, default)
+        elif isinstance(default, type):
+            # DEFAULTS is a class with nested classes; convert to plain dict
+            super().__init__(None, _class_to_dict(default))
+        else:
+            super().__init__(None)
 
         self.__is_set = {}
 
