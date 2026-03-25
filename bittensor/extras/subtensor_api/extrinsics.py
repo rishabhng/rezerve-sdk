@@ -13,6 +13,7 @@ class Extrinsics:
         self.add_stake_burn = subtensor.add_stake_burn
         self.add_stake_multiple = subtensor.add_stake_multiple
         self.announce_coldkey_swap = subtensor.announce_coldkey_swap
+        self.clear_coldkey_swap_announcement = subtensor.clear_coldkey_swap_announcement
         self.dispute_coldkey_swap = subtensor.dispute_coldkey_swap
         self.burned_register = subtensor.burned_register
         self.claim_root = subtensor.claim_root

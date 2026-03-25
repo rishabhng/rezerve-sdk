@@ -56,6 +56,7 @@ from bittensor.core.extrinsics.asyncex.children import (
 )
 from bittensor.core.extrinsics.asyncex.coldkey_swap import (
     announce_coldkey_swap_extrinsic,
+    clear_coldkey_swap_announcement_extrinsic,
     dispute_coldkey_swap_extrinsic,
     swap_coldkey_announced_extrinsic,
 )
@@ -7105,6 +7106,50 @@ class AsyncSubtensor(SubtensorMixin):
             - After disputing, only root can clear the state via reset_coldkey_swap.
         """
         return await dispute_coldkey_swap_extrinsic(
+            subtensor=self,
+            wallet=wallet,
+            mev_protection=mev_protection,
+            period=period,
+            raise_error=raise_error,
+            wait_for_inclusion=wait_for_inclusion,
+            wait_for_finalization=wait_for_finalization,
+            wait_for_revealed_execution=wait_for_revealed_execution,
+        )
+
+    async def clear_coldkey_swap_announcement(
+        self,
+        wallet: "Wallet",
+        *,
+        mev_protection: bool = DEFAULT_MEV_PROTECTION,
+        period: Optional[int] = DEFAULT_PERIOD,
+        raise_error: bool = False,
+        wait_for_inclusion: bool = True,
+        wait_for_finalization: bool = True,
+        wait_for_revealed_execution: bool = True,
+    ) -> ExtrinsicResponse:
+        """
+        Clears (withdraws) a pending coldkey swap announcement.
+
+        Callable by the coldkey that has an active, undisputed swap announcement. The reannouncement delay must have
+        elapsed past the execution block before the announcement can be cleared.
+
+        Parameters:
+            wallet: Bittensor wallet object (should be the current coldkey with an active announcement).
+            mev_protection: If ``True``, encrypts and submits the transaction through the MEV Shield pallet.
+            period: The number of blocks during which the transaction will remain valid.
+            raise_error: Raises a relevant exception rather than returning ``False`` if unsuccessful.
+            wait_for_inclusion: Whether to wait for the inclusion of the transaction.
+            wait_for_finalization: Whether to wait for the finalization of the transaction.
+            wait_for_revealed_execution: Whether to wait for the revealed execution if mev_protection used.
+
+        Returns:
+            ExtrinsicResponse: The result object of the extrinsic execution.
+
+        Notes:
+            - The coldkey must have an active, undisputed swap announcement.
+            - The reannouncement delay must have elapsed past the execution block.
+        """
+        return await clear_coldkey_swap_announcement_extrinsic(
             subtensor=self,
             wallet=wallet,
             mev_protection=mev_protection,
