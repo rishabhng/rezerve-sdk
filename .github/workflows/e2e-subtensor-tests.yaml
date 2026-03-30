@@ -42,10 +42,10 @@ jobs:
       test-files: ${{ steps.get-tests.outputs.test-files }}
     steps:
       - name: Check-out repository under $GITHUB_WORKSPACE
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.10'
 
@@ -57,7 +57,7 @@ jobs:
           ignore-nothing-to-cache: true
 
       - name: Cache uv and venv
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.cache/uv
@@ -92,7 +92,7 @@ jobs:
     outputs:
       python-versions: ${{ steps.read-versions.outputs.versions }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - id: read-versions
         run: |
           versions=$(cat .github/supported-python-versions.json)
@@ -201,7 +201,7 @@ jobs:
         run: docker save -o subtensor-localnet.tar ${{ steps.set-image.outputs.image }}
 
       - name: Upload Docker Image as Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: subtensor-localnet
           path: subtensor-localnet.tar
