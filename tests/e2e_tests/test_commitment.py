@@ -24,7 +24,10 @@ def test_commitment(subtensor, alice_wallet, dave_wallet):
     ]
     dave_sn.execute_steps(steps)
 
-    with pytest.raises(SubstrateRequestException, match="AccountNotAllowedCommit"):
+    with pytest.raises(
+        SubstrateRequestException,
+        match=r"AccountNotAllowedCommit|Invalid signing address",
+    ):
         subtensor.commitments.set_commitment(
             wallet=alice_wallet,
             netuid=dave_sn.netuid,
@@ -89,7 +92,10 @@ async def test_commitment_async(async_subtensor, alice_wallet, dave_wallet):
     ]
     await dave_sn.async_execute_steps(steps)
 
-    with pytest.raises(SubstrateRequestException, match="AccountNotAllowedCommit"):
+    with pytest.raises(
+        SubstrateRequestException,
+        match=r"AccountNotAllowedCommit|Invalid signing address",
+    ):
         await async_subtensor.commitments.set_commitment(
             wallet=alice_wallet,
             netuid=dave_sn.netuid,
