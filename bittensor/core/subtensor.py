@@ -5047,7 +5047,7 @@ class Subtensor(SubtensorMixin):
             # Estimate fee before sending a transfer
             call = subtensor.compose_call(
                 call_module="Balances",
-                call_function="transfer",
+                call_function="transfer_allow_death",
                 call_params={"dest": destination_ss58, "value": amount.rao}
             )
             fee = subtensor.get_extrinsic_fee(call=call, keypair=wallet.coldkey)

@@ -13,7 +13,7 @@ jobs:
     outputs:
       python-versions: ${{ steps.read-versions.outputs.versions }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - id: read-versions
         run: |
           versions=$(cat .github/supported-python-versions.json)
@@ -29,8 +29,8 @@ jobs:
         python-version: ${{ fromJson(needs.read-python-versions.outputs.python-versions) }}
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
 
