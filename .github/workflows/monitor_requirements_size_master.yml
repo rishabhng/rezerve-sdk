@@ -20,7 +20,7 @@ jobs:
     outputs:
       python-versions: ${{ steps.read-versions.outputs.versions }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - id: read-versions
         run: |
           versions=$(cat .github/supported-python-versions.json)
@@ -40,8 +40,8 @@ jobs:
       py313: ${{ steps.set-output.outputs.py313 }}
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -70,7 +70,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Post venv size summary to PR
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
