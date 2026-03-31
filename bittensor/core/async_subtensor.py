@@ -6221,7 +6221,7 @@ class AsyncSubtensor(SubtensorMixin):
             # Estimate fee before sending a transfer
             call = await subtensor.compose_call(
                 call_module="Balances",
-                call_function="transfer",
+                call_function="transfer_allow_death",
                 call_params={"dest": destination_ss58, "value": amount.rao}
             )
             fee = await subtensor.get_extrinsic_fee(call=call, keypair=wallet.coldkey)
