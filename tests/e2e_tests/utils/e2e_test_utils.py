@@ -64,7 +64,7 @@ def clone_or_update_templates(specific_commit=None):
     """
     install_dir = template_path
     repo_mapping = {
-        templates_repo: "https://github.com/latent-to/subnet-template",
+        templates_repo: "https://github.com/latent-to/subnet-template.git",
     }
 
     cwd = os.getcwd()
