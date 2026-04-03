@@ -15,6 +15,7 @@ from tests.e2e_tests.utils import (
     ACTIVATE_SUBNET,
     REGISTER_NEURON,
 )
+from tests.helpers import CloseInValue
 
 """
 Verifies:
@@ -142,12 +143,9 @@ def test_subtensor_extrinsics(subtensor, templates, alice_wallet, bob_wallet):
 
     bob_balance = subtensor.wallets.get_balance(bob_wallet.coldkeypub.ss58_address)
 
-    alice_sn.execute_steps(
-        [
-            ACTIVATE_SUBNET(alice_wallet),
-            REGISTER_NEURON(bob_wallet),
-        ]
-    )
+    alice_sn.execute_one(ACTIVATE_SUBNET(alice_wallet))
+    recycle_amount = subtensor.subnets.recycle(netuid)
+    reg_response = alice_sn.execute_one(REGISTER_NEURON(bob_wallet))
 
     # Verify Bob's UID on netuid 2 is 1
     assert (
@@ -157,17 +155,16 @@ def test_subtensor_extrinsics(subtensor, templates, alice_wallet, bob_wallet):
         == 1
     ), "UID for Bob's hotkey on netuid 2 is not 1 as expected"
 
-    # Fetch recycle_amount to register to the subnet
-    recycle_amount = subtensor.subnets.recycle(netuid)
-    fee = alice_sn.calls[-1].response.extrinsic_fee
+    fee = reg_response.extrinsic_fee
     bob_balance_post_reg = subtensor.wallets.get_balance(
         bob_wallet.coldkeypub.ss58_address
     )
 
-    # Ensure recycled amount is only deducted from the balance after registration
-    assert bob_balance - recycle_amount - fee == bob_balance_post_reg, (
-        "Balance for Bob is not correct after burned register"
-    )
+    # Burn decays every block and bumps after registration; hence tolerance
+    expected_post = bob_balance - recycle_amount - fee
+    assert (
+        CloseInValue(bob_balance_post_reg, Balance.from_tao(0.002)) == expected_post
+    ), "Balance for Bob is not correct after burned register"
 
     with templates.validator(alice_wallet, netuid):
         # wait for 5 seconds for the metagraph and subtensor to refresh with latest data
@@ -311,12 +308,9 @@ async def test_subtensor_extrinsics_async(
         bob_wallet.coldkeypub.ss58_address
     )
 
-    await alice_sn.async_execute_steps(
-        [
-            ACTIVATE_SUBNET(alice_wallet),
-            REGISTER_NEURON(bob_wallet),
-        ]
-    )
+    await alice_sn.async_execute_one(ACTIVATE_SUBNET(alice_wallet))
+    recycle_amount = await async_subtensor.subnets.recycle(netuid)
+    reg_response = await alice_sn.async_execute_one(REGISTER_NEURON(bob_wallet))
 
     # Verify Bob's UID on netuid 2 is 1
     assert (
@@ -326,17 +320,16 @@ async def test_subtensor_extrinsics_async(
         == 1
     ), "UID for Bob's hotkey on netuid 2 is not 1 as expected."
 
-    # Fetch recycle_amount to register to the subnet
-    recycle_amount = await async_subtensor.subnets.recycle(netuid)
-    fee = alice_sn.calls[-1].response.extrinsic_fee
+    fee = reg_response.extrinsic_fee
     bob_balance_post_reg = await async_subtensor.wallets.get_balance(
         bob_wallet.coldkeypub.ss58_address
     )
 
-    # Ensure recycled amount is only deducted from the balance after registration
-    assert bob_balance - recycle_amount - fee == bob_balance_post_reg, (
-        "Balance for Bob is not correct after burned register"
-    )
+    expected_post = bob_balance - recycle_amount - fee
+    # Burn decays every block and bumps after registration; hence tolerance
+    assert (
+        CloseInValue(bob_balance_post_reg, Balance.from_tao(0.005)) == expected_post
+    ), "Balance for Bob is not correct after burned register"
 
     # neuron_info_old = subtensor.get_neuron_for_pubkey_and_subnet(
     #     alice_wallet.hotkey.ss58_address, netuid=netuid
