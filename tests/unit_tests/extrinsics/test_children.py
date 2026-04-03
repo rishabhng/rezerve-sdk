@@ -91,7 +91,7 @@ def test_root_set_pending_childkey_cooldown_extrinsic(subtensor, mocker, fake_wa
         period=None,
         raise_error=False,
         wait_for_inclusion=True,
-        wait_for_finalization=False,
+        wait_for_finalization=True,
     )
     assert success is True
     assert "Success" in message

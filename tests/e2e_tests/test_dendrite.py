@@ -46,7 +46,7 @@ def test_dendrite(subtensor, templates, alice_wallet, bob_wallet):
         REGISTER_SUBNET(alice_wallet),
         SUDO_SET_TEMPO(alice_wallet, AdminUtils, True, NETUID, TEMPO_TO_SET),
         ACTIVATE_SUBNET(alice_wallet),
-        SUDO_SET_MAX_ALLOWED_VALIDATORS(alice_wallet, AdminUtils, True, NETUID, 1),
+        SUDO_SET_MAX_ALLOWED_VALIDATORS(alice_wallet, AdminUtils, True, NETUID, 2),
         SUDO_SET_WEIGHTS_SET_RATE_LIMIT(alice_wallet, AdminUtils, True, NETUID, 10),
         REGISTER_NEURON(bob_wallet),
     ]
@@ -160,7 +160,7 @@ async def test_dendrite_async(async_subtensor, templates, alice_wallet, bob_wall
         REGISTER_SUBNET(alice_wallet),
         SUDO_SET_TEMPO(alice_wallet, AdminUtils, True, NETUID, TEMPO_TO_SET),
         ACTIVATE_SUBNET(alice_wallet),
-        SUDO_SET_MAX_ALLOWED_VALIDATORS(alice_wallet, AdminUtils, True, NETUID, 1),
+        SUDO_SET_MAX_ALLOWED_VALIDATORS(alice_wallet, AdminUtils, True, NETUID, 2),
         SUDO_SET_WEIGHTS_SET_RATE_LIMIT(alice_wallet, AdminUtils, True, NETUID, 10),
         REGISTER_NEURON(bob_wallet),
     ]

@@ -20,6 +20,32 @@ from tests.e2e_tests.utils import (
 from tests.helpers.helpers import CloseInValue
 
 
+def _get_expected_balance_after_neuron_registrations(
+    initial_balance: Balance, sns: list[TestSubnet]
+) -> Balance:
+    """
+    Get the expected balance after neuron registrations
+    by subtracting the total registration cost from the initial balance.
+    """
+    total_registration_cost = Balance.from_rao(0)
+
+    for sn in sns:
+        for call in sn.calls:
+            if call.operation != REGISTER_NEURON.__name__:
+                continue
+
+            balance_before = call.response.data.get("balance_before")
+            balance_after = call.response.data.get("balance_after")
+
+            assert balance_before is not None and balance_after is not None, (
+                "REGISTER_NEURON response missing balance data."
+            )
+
+            total_registration_cost += balance_before - balance_after
+
+    return initial_balance - total_registration_cost
+
+
 def test_single_operation(subtensor, alice_wallet, bob_wallet):
     """
     Tests:
@@ -334,6 +360,9 @@ def test_batch_operations(subtensor, alice_wallet, bob_wallet):
     - Checks Accounts Balance
     """
     subnets_tested = 2
+    bob_balance_before_setup = subtensor.wallets.get_balance(
+        bob_wallet.coldkey.ss58_address
+    )
 
     sns = [TestSubnet(subtensor) for _ in range(subnets_tested)]
 
@@ -357,6 +386,9 @@ def test_batch_operations(subtensor, alice_wallet, bob_wallet):
         )
 
     netuids = [sn.netuid for sn in sns]
+    expected_bob_balance = _get_expected_balance_after_neuron_registrations(
+        bob_balance_before_setup, sns
+    )
 
     balances = subtensor.wallets.get_balances(
         alice_wallet.coldkey.ss58_address,
@@ -443,10 +475,7 @@ def test_batch_operations(subtensor, alice_wallet, bob_wallet):
         bob_wallet.coldkey.ss58_address,
     )
 
-    assert CloseInValue(  # Make sure we are within 0.0002 TAO due to tx fees
-        balances[bob_wallet.coldkey.ss58_address], Balance.from_rao(5_000_000)
-    ) == Balance.from_tao(999_999.7979)
-
+    assert balances[bob_wallet.coldkey.ss58_address] == expected_bob_balance
     assert balances[alice_wallet.coldkey.ss58_address] > alice_balance
 
 
@@ -460,6 +489,9 @@ async def test_batch_operations_async(async_subtensor, alice_wallet, bob_wallet)
     - Checks Accounts Balance
     """
     subnets_tested = 2
+    bob_balance_before_setup = await async_subtensor.wallets.get_balance(
+        bob_wallet.coldkey.ss58_address
+    )
 
     sns = [TestSubnet(async_subtensor) for _ in range(subnets_tested)]
 
@@ -483,6 +515,9 @@ async def test_batch_operations_async(async_subtensor, alice_wallet, bob_wallet)
         )
 
     netuids = [sn.netuid for sn in sns]
+    expected_bob_balance = _get_expected_balance_after_neuron_registrations(
+        bob_balance_before_setup, sns
+    )
 
     balances = await async_subtensor.wallets.get_balances(
         alice_wallet.coldkey.ss58_address,
@@ -569,10 +604,7 @@ async def test_batch_operations_async(async_subtensor, alice_wallet, bob_wallet)
         bob_wallet.coldkey.ss58_address,
     )
 
-    assert CloseInValue(  # Make sure we are within 0.0002 TAO due to tx fees
-        balances[bob_wallet.coldkey.ss58_address], Balance.from_rao(5_000_000)
-    ) == Balance.from_tao(999_999.7979)
-
+    assert balances[bob_wallet.coldkey.ss58_address] == expected_bob_balance
     assert balances[alice_wallet.coldkey.ss58_address] > alice_balance
 
 

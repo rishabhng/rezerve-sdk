@@ -1,6 +1,7 @@
 import os.path
 import shutil
 import time
+from dataclasses import replace
 import numpy as np
 import pytest
 
@@ -25,6 +26,12 @@ from tests.e2e_tests.utils import (
 )
 
 NULL_KEY = tuple(bytearray(32))
+
+
+def _strip_unique_fields_for_metagraph_parity(m: MetagraphInfo) -> MetagraphInfo:
+    # get_metagraph_info (selective mechagraph) contains validators/commitments;
+    # get_all_metagraphs_info does not get these fields from the chain.
+    return replace(m, validators=None, commitments=None)
 
 
 torch = LazyLoadedTorch()
@@ -833,7 +840,9 @@ def test_metagraph_info(subtensor, alice_wallet, bob_wallet):
     metagraph_infos = subtensor.metagraphs.get_all_metagraphs_info(block=block)
 
     assert len(metagraph_infos) == 4
-    assert metagraph_infos[-1] == metagraph_info
+    assert metagraph_infos[-1] == _strip_unique_fields_for_metagraph_parity(
+        metagraph_info
+    )
 
     # non-existed subnet
     metagraph_info = subtensor.metagraphs.get_metagraph_info(netuid=bob_sn.netuid + 1)
@@ -1088,7 +1097,9 @@ async def test_metagraph_info_async(async_subtensor, alice_wallet, bob_wallet):
     )
 
     assert len(metagraph_infos) == 4
-    assert metagraph_infos[-1] == metagraph_info
+    assert metagraph_infos[-1] == _strip_unique_fields_for_metagraph_parity(
+        metagraph_info
+    )
 
     # non-existed subnet
     metagraph_info = await async_subtensor.metagraphs.get_metagraph_info(

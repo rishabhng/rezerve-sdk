@@ -111,7 +111,7 @@ def root_set_pending_childkey_cooldown_extrinsic(
     period: Optional[int] = None,
     raise_error: bool = False,
     wait_for_inclusion: bool = True,
-    wait_for_finalization: bool = False,
+    wait_for_finalization: bool = True,
     wait_for_revealed_execution: bool = True,
 ) -> ExtrinsicResponse:
     """
