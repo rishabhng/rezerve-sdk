@@ -20,6 +20,9 @@ def test_announce_coldkey_swap_extrinsic(subtensor, mocker):
         "unlock_wallet",
         return_value=ExtrinsicResponse(success=True, message="Unlocked"),
     )
+    mocked_get_staking_hotkeys = mocker.patch.object(
+        subtensor, "get_staking_hotkeys", return_value=[]
+    )
     mocked_keypair = mocker.patch("bittensor.core.extrinsics.coldkey_swap.Keypair")
     mocked_keypair_instance = mocker.MagicMock()
     mocked_keypair_instance.public_key = b"\x00" * 32
@@ -49,6 +52,7 @@ def test_announce_coldkey_swap_extrinsic(subtensor, mocker):
 
     # Asserts
     mocked_unlock_wallet.assert_called_once_with(wallet, False)
+    mocked_get_staking_hotkeys.assert_called_once_with(new_coldkey_ss58)
     mocked_keypair.assert_called_once_with(ss58_address=new_coldkey_ss58)
     mocked_compute_hash.assert_called_once_with(mocked_keypair_instance)
     mocked_subtensor_module.assert_called_once_with(subtensor)
@@ -77,6 +81,9 @@ def test_announce_coldkey_swap_extrinsic_with_mev_protection(subtensor, mocker):
         ExtrinsicResponse,
         "unlock_wallet",
         return_value=ExtrinsicResponse(success=True, message="Unlocked"),
+    )
+    mocked_get_staking_hotkeys = mocker.patch.object(
+        subtensor, "get_staking_hotkeys", return_value=[]
     )
     mocked_keypair = mocker.patch("bittensor.core.extrinsics.coldkey_swap.Keypair")
     mocked_keypair_instance = mocker.MagicMock()
@@ -107,6 +114,7 @@ def test_announce_coldkey_swap_extrinsic_with_mev_protection(subtensor, mocker):
 
     # Asserts
     mocked_unlock_wallet.assert_called_once_with(wallet, False)
+    mocked_get_staking_hotkeys.assert_called_once_with(new_coldkey_ss58)
     mocked_subtensor_module.assert_called_once_with(subtensor)
     mocked_pallet_instance.announce_coldkey_swap.assert_called_once_with(
         new_coldkey_hash="0x" + "00" * 32

@@ -31,6 +31,7 @@ class Staking:
         self.get_stake_info_for_coldkeys = subtensor.get_stake_info_for_coldkeys
         self.get_stake_movement_fee = subtensor.get_stake_movement_fee
         self.get_stake_weight = subtensor.get_stake_weight
+        self.get_staking_hotkeys = subtensor.get_staking_hotkeys
         self.get_unstake_fee = subtensor.get_unstake_fee
         self.move_stake = subtensor.move_stake
         self.set_auto_stake = subtensor.set_auto_stake
