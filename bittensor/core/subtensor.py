@@ -3666,6 +3666,27 @@ class Subtensor(SubtensorMixin):
         )
         return [u16_normalized_float(w) for w in cast(list[int], result or [])]
 
+    def get_staking_hotkeys(
+        self, coldkey_ss58: str, block: Optional[int] = None
+    ) -> list[str]:
+        """
+        Retrieves the hotkeys that have staked for a given coldkey.
+
+        Parameters:
+            coldkey_ss58: The SS58 address of the coldkey.
+            block: The block number at which to query the stake information.
+
+        Returns:
+            A list of hotkey SS58 addresses that have staked for the given coldkey.
+        """
+        result = self.substrate.query(
+            module="SubtensorModule",
+            storage_function="StakingHotkeys",
+            params=[coldkey_ss58],
+            block_hash=self.determine_block_hash(block),
+        )
+        return [decode_account_id(hotkey[0]) for hotkey in result or []]
+
     def get_start_call_delay(self, block: Optional[int] = None) -> int:
         """
         Retrieves the start call delay in blocks.

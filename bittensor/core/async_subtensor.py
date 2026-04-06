@@ -4468,6 +4468,36 @@ class AsyncSubtensor(SubtensorMixin):
         )
         return [u16_normalized_float(w) for w in cast(list[int], result or [])]
 
+    async def get_staking_hotkeys(
+        self,
+        coldkey_ss58: str,
+        block: Optional[int] = None,
+        block_hash: Optional[str] = None,
+        reuse_block: bool = False,
+    ) -> list[str]:
+        """
+        Retrieves the hotkeys that have staked for a given coldkey.
+
+        Parameters:
+            coldkey_ss58: The SS58 address of the coldkey.
+            block: The block number at which to query the stake information.
+            block_hash: The hash of the blockchain block number for the query.
+            reuse_block: Whether to reuse the last-used block hash.
+
+        Returns:
+            A list of hotkey SS58 addresses that have staked for the given coldkey.
+        """
+        block_hash = await self.determine_block_hash(
+            block=block, block_hash=block_hash, reuse_block=reuse_block
+        )
+        result = await self.substrate.query(
+            module="SubtensorModule",
+            storage_function="StakingHotkeys",
+            params=[coldkey_ss58],
+            block_hash=block_hash,
+        )
+        return [decode_account_id(hotkey[0]) for hotkey in result or []]
+
     async def get_start_call_delay(
         self,
         block: Optional[int] = None,
