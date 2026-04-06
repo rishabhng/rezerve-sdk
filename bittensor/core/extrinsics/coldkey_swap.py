@@ -69,7 +69,6 @@ def announce_coldkey_swap_extrinsic(
         ).success:
             return unlocked
 
-
         staking_hotkeys = subtensor.get_staking_hotkeys(new_coldkey_ss58)
         if staking_hotkeys:
             error_msg = "Destination coldkey cannot have any staking hotkeys. Please use a new coldkey for the swap."
