@@ -60,6 +60,7 @@ def announce_coldkey_swap_extrinsic(
         - A swap cost is charged when making the first announcement (not when reannouncing).
         - After making an announcement, all transactions from the coldkey are blocked except for `swap_coldkey_announced`.
         - The swap can only be executed after the delay period has passed (check via `get_coldkey_swap_announcement`).
+        - The destination coldkey cannot have any staking hotkeys. It must be completely new without any staking activity.
         - See: <https://docs.learnbittensor.org/keys/coldkey-swap>
     """
     try:
@@ -67,6 +68,18 @@ def announce_coldkey_swap_extrinsic(
             unlocked := ExtrinsicResponse.unlock_wallet(wallet, raise_error)
         ).success:
             return unlocked
+
+
+        staking_hotkeys = subtensor.get_staking_hotkeys(new_coldkey_ss58)
+        if staking_hotkeys:
+            error_msg = "Destination coldkey cannot have any staking hotkeys. Please use a new coldkey for the swap."
+            if raise_error:
+                raise ValueError(error_msg)
+            return ExtrinsicResponse(
+                success=False,
+                message=error_msg,
+                extrinsic_receipt=None,
+            )
 
         # Compute hash of new coldkey
         new_keypair = Keypair(
