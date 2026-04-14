@@ -3,12 +3,12 @@ requires = ["setuptools>=70.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "bittensor"
+name = "rezerve-sdk"
 version = "10.2.0"
-description = "Bittensor SDK"
+description = "Rezerve SDK"
 readme = "README.md"
 authors = [
-    {name = "bittensor.com"}
+    {name = "rezerve.network"}
 ]
 license = { file = "LICENSE" }
 requires-python = ">=3.10,<3.15"
@@ -70,8 +70,8 @@ cli = [
 
 [project.urls]
 # more details can be found here
-homepage = "https://github.com/opentensor/bittensor"
-Repository = "https://github.com/opentensor/bittensor"
+homepage = "https://github.com/rishabhng/rezerve-sdk"
+Repository = "https://github.com/rishabhng/rezerve-sdk"
 
 [tool.setuptools.package-data]
 bittensor = ["py.typed"]

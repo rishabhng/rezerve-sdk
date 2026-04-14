@@ -1,6 +1,6 @@
 <div align="center">
 
-# **Bittensor SDK** <!-- omit in toc -->
+# **Rezerve SDK** <!-- omit in toc -->
 [![Discord Chat](https://img.shields.io/discord/308323056592486420.svg)](https://discord.gg/bittensor)
 [![CodeQL](https://github.com/opentensor/bittensor/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/opentensor/bittensor/actions)
 [![PyPI version](https://badge.fury.io/py/bittensor.svg)](https://badge.fury.io/py/bittensor)
@@ -15,14 +15,14 @@
 
 </div>
 
-- [Overview of Bittensor](#overview-of-bittensor)
-- [The Bittensor SDK](#the-bittensor-sdk)
-- [Is Bittensor a blockchain or an AI platform?](#is-bittensor-a-blockchain-or-an-ai-platform)
+- [Overview of Rezerve](#overview-of-rezerve)
+- [The Rezerve SDK](#the-rezerve-sdk)
+- [Is Rezerve a blockchain or an AI platform?](#is-rezerve-a-blockchain-or-an-ai-platform)
 - [Subnets](#subnets)
 - [Subnet validators and subnet miners](#subnet-validators-and-subnet-miners)
 - [Yuma Consensus](#yuma-consensus)
 - [Release Notes](#release-notes)
-- [Install Bittensor SDK](#install-bittensor-sdk)
+- [Install Rezerve SDK](#install-rezerve-sdk)
 - [Upgrade](#upgrade)
 - [Install on macOS and Linux](#install-on-macos-and-linux)
   - [Install using a Bash command](#install-using-a-bash-command)
@@ -37,25 +37,25 @@
 
 ---
 
-## Overview of Bittensor
+## Overview of Rezerve
 
-Welcome! Bittensor is an open source platform on which you can produce competitive digital commodities. These digital commodities can be machine intelligence, storage space, compute power, protein folding, financial markets prediction, and many more. You are rewarded in **TAO** when you produce best digital commodities.
+Welcome! Rezerve is an open source platform on which you can produce competitive digital commodities. These digital commodities can be machine intelligence, storage space, compute power, protein folding, financial markets prediction, and many more. You are rewarded in **TAO** when you produce best digital commodities.
 
-## The Bittensor SDK
+## The Rezerve SDK
 
-The Opentensor Foundation (OTF) provides all the open source tools, including this Bittensor SDK, the codebase and the documentation, with step-by-step tutorials and guides, to enable you to participate in the Bittensor ecosystem. 
+The Rezerve SDK provides all the open source tools, the codebase and the documentation, with step-by-step tutorials and guides, to enable you to participate in the Rezerve ecosystem. 
 
 - **Developer documentation**: https://docs.learnbittensor.org.
-- **A Beginner's Q and A on Bittensor**: https://docs.learnbittensor.org/questions-and-answers.
-- **Bittensor whitepaper**: https://bittensor.com/whitepaper.
+- **A Beginner's Q and A on Rezerve**: https://docs.learnbittensor.org/questions-and-answers.
+- **Rezerve whitepaper**: https://bittensor.com/whitepaper.
 
-This Bittensor SDK contains ready-to-use Python packages for interacting with the Bittensor ecosystem, writing subnet incentive mechanisms, subnet miners, subnet validators and querying the subtensor (the blockchain part of the Bittensor network). 
+This Rezerve SDK contains ready-to-use Python packages for interacting with the Rezerve ecosystem, writing subnet incentive mechanisms, subnet miners, subnet validators and querying the subtensor (the blockchain part of the Rezerve network). 
 
 ---
 
-## Is Bittensor a blockchain or an AI platform?
+## Is Rezerve a blockchain or an AI platform?
 
-In Bittensor there is one blockchain, and many platforms that are connected to this one blockchain. We call these platforms as **subnets**, and this one blockchain  **subtensor**. So, a subnet can be AI-related or it can be something else. The Bittensor network has a number of distinct subnets. All these subnets interact with subtensor blockchain. If you are thinking, "So, subnets are not part of the blockchain but only interact with it?" then the answer is "yes, exactly."
+In Rezerve there is one blockchain, and many platforms that are connected to this one blockchain. We call these platforms as **subnets**, and this one blockchain  **subtensor**. So, a subnet can be AI-related or it can be something else. The Rezerve network has a number of distinct subnets. All these subnets interact with subtensor blockchain. If you are thinking, "So, subnets are not part of the blockchain but only interact with it?" then the answer is "yes, exactly."
 
 ## Subnets
 
@@ -67,24 +67,24 @@ Subnets, which exist outside the blockchain and are connected to it, are off-cha
 
 ## Yuma Consensus
 
-Scores are assigned to the top-performing subnet miners and subnet validators. The on-chain Yuma Consensus determines the TAO rewards for these top performers. The Bittensor blockchain, the subtensor, runs on decentralized validation nodes, just like any blockchain.
+Scores are assigned to the top-performing subnet miners and subnet validators. The on-chain Yuma Consensus determines the TAO rewards for these top performers. The Rezerve blockchain, the subtensor, runs on decentralized validation nodes, just like any blockchain.
 
-**This SDK repo is for Bittensor platform only**
-This Bittensor SDK codebase is for the Bittensor platform only, designed to help developers create subnets and build tools on Bittensor. For subnets and applications, refer to subnet-specific websites, which are maintained by subnet owners.
+**This SDK repo is for Rezerve platform only**
+This Rezerve SDK codebase is for the Rezerve platform only, designed to help developers create subnets and build tools on Rezerve. For subnets and applications, refer to subnet-specific websites, which are maintained by subnet owners.
 
 ## Release Notes
 
-See [Bittensor SDK Release Notes](https://docs.learnbittensor.org/bittensor-rel-notes).
+See [Rezerve SDK Release Notes](https://docs.learnbittensor.org/bittensor-rel-notes).
 
 ---
 
-## Install Bittensor SDK
+## Install Rezerve SDK
 
-Before you can start developing, you must install Bittensor SDK and then create Bittensor wallet.
+Before you can start developing, you must install Rezerve SDK and then create a Rezerve wallet.
 
 ## Upgrade
 
-If you already installed Bittensor SDK, make sure you upgrade to the latest version. Run the below command:
+If you already installed Rezerve SDK, make sure you upgrade to the latest version. Run the below command:
 
 ```bash
 python3 -m pip install --upgrade bittensor
@@ -102,7 +102,7 @@ you are using a Mac, to first install Python from [Homebrew](https://brew.sh/). 
 the preinstalled Python version from macOS, things may not work completely.
 
 ### Installation
-You can install Bittensor SDK on your local machine in either of the following ways. **Make sure you verify your installation after you install**:
+You can install Rezerve SDK on your local machine in either of the following ways. **Make sure you verify your installation after you install**:
 - [Install using a Bash command](#install-using-a-bash-command).
 - [Install using `pip3 install`](#install-using-pip3-install)
 - [Install from source](#install-from-source)
@@ -134,23 +134,23 @@ pip install bittensor
 
     - Activate the new environment. Follow [this guide on python.org](https://docs.python.org/3/library/venv.html#how-venvs-work)
 
-2. Clone the Bittensor SDK repo
+2. Clone the Rezerve SDK repo
 
 ```bash
-git clone https://github.com/opentensor/bittensor.git
+git clone https://github.com/rishabhng/rezerve-sdk.git
 ```
 
 3.  Install
 
 You can install using any of the below options:
 
-- **Install SDK**: Run the below command to install Bittensor SDK in the above virtual environment. This will also install `btcli`.
+- **Install SDK**: Run the below command to install Rezerve SDK in the above virtual environment.
 
     ```python
     pip install bittensor
     ```
 
-- **Install SDK with `torch`**: Install Bittensor SDK with [`torch`](https://pytorch.org/docs/stable/torch.html).
+- **Install SDK with `torch`**: Install Rezerve SDK with [`torch`](https://pytorch.org/docs/stable/torch.html).
 
    ```python
     pip install bittensor[torch]
@@ -161,7 +161,7 @@ You can install using any of the below options:
     pip install "bittensor[torch]"
     ```
 
-- **Install SDK with `cubit`**: Install Bittensor SDK with [`cubit`](https://github.com/opentensor/cubit).
+- **Install SDK with `cubit`**: Install Rezerve SDK with [`cubit`](https://github.com/opentensor/cubit).
 
   1. Install `cubit` first. See the [Install](https://github.com/opentensor/cubit?tab=readme-ov-file#install) section. **Only Python 3.9 and 3.10 versions are supported**. 
   2. Then install SDK with `pip install bittensor`.
@@ -177,7 +177,7 @@ error, use the command `python -m bittensor certifi` which will update your loca
 
 ## Install on Windows
 
-To install and run Bittensor SDK on Windows you must install [**WSL 2** (Windows Subsystem for Linux)](https://learn.microsoft.com/en-us/windows/wsl/about) on Windows and select [Ubuntu Linux distribution](https://github.com/ubuntu/WSL/blob/main/docs/guides/install-ubuntu-wsl2.md). 
+To install and run Rezerve SDK on Windows you must install [**WSL 2** (Windows Subsystem for Linux)](https://learn.microsoft.com/en-us/windows/wsl/about) on Windows and select [Ubuntu Linux distribution](https://github.com/ubuntu/WSL/blob/main/docs/guides/install-ubuntu-wsl2.md). 
 
 After you installed the above, follow the same installation steps described above in [Install on macOS and Linux](#install-on-macos-and-linux).
 
@@ -224,7 +224,7 @@ You will see the version number you installed in place of `<version number>`.
 
 ### Verify by listing axon information
 
-You can also verify the Bittensor SDK installation by listing the axon information for the neurons. Enter the following lines in the Python interpreter.
+You can also verify the Rezerve SDK installation by listing the axon information for the neurons. Enter the following lines in the Python interpreter.
 
 ```python
 import bittensor

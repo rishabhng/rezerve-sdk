@@ -24,10 +24,10 @@ if not READ_ONLY:
     WALLETS_DIR.mkdir(parents=True, exist_ok=True)
     MINERS_DIR.mkdir(parents=True, exist_ok=True)
 
-# Bittensor networks name
+# Rezerve networks name
 NETWORKS = ["finney", "test", "archive", "local", "latent-lite"]
 
-# Bittensor endpoints (Needs to use wss://)
+# Rezerve chain endpoints (Needs to use wss://)
 FINNEY_ENTRYPOINT = "wss://entrypoint-finney.opentensor.ai:443"
 FINNEY_TEST_ENTRYPOINT = "wss://test.finney.opentensor.ai:443"
 ARCHIVE_ENTRYPOINT = "wss://archive.chain.opentensor.ai:443"
@@ -53,7 +53,7 @@ REVERSE_NETWORK_MAP = {
 DEFAULT_NETWORK = NETWORKS[0]
 DEFAULT_ENDPOINT = NETWORK_MAP[DEFAULT_NETWORK]
 
-# Currency Symbols Bittensor
+# Currency Symbols Rezerve
 TAO_SYMBOL: str = chr(0x03C4)
 RAO_SYMBOL: str = chr(0x03C1)
 
